@@ -34,7 +34,6 @@ function App() {
     <>
       <div>
         <h1>Todo App</h1>
-        <p>Let's build this app</p>
         {isLoggedIn ? (
           <TodoApp authToken={authToken} onLogout={handleLogout} /> 
         ) : (

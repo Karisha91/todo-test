@@ -72,39 +72,62 @@ const TodoApp = ({ authToken, onLogout }) => {
         }
     }
 
-    return (
-        <div>
-            <h1>Todo App</h1>
-            <button onClick={onLogout}>Logout</button>
-            <form onSubmit={(e) => {
-                e.preventDefault()
-                if (newTodo.trim()) {
-                    addTodo(newTodo)
-                    setNewTodo('') 
-                }
-            }}>
-                <input
-                    type="text"
-                    value={newTodo}
-                    onChange={(e) => setNewTodo(e.target.value)}
-                    placeholder="Add a new todo..."
-                />
-                <button type="submit">Add Todo</button>
-            </form>
+    const toggleComplete = async (id, currentlyCompleted) => {
+    try {
+        const response = await fetch(`http://localhost:8080/todos/${id}/toggle`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        if (response.ok) {
+            fetchTodos();
+        }
+    } catch (error) {
+        console.error('Error updating todo:', error);
+    }
+};
 
-            <h2>Your Todos:</h2>
-            <ul>
-                {todos.map(todo => (
-                    <li key={todo.id}>
-                        {todo.title} - {todo.completed ? '✅' : '⏳'}
-                        <button onClick={() => deleteTodo(todo.id)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+  return (
+    <div>
+        
+        <button onClick={onLogout}>Logout</button>
+        <form onSubmit={(e) => {
+            e.preventDefault()
+            if (newTodo.trim()) {
+                addTodo(newTodo)
+                setNewTodo('') 
+            }
+        }}>
+            <input
+                type="text"
+                value={newTodo}
+                onChange={(e) => setNewTodo(e.target.value)}
+                placeholder="Add a new todo..."
+            />
+            <button type="submit">Add Todo</button>
+        </form>
 
-            {todos.length === 0 && <p>No todos found</p>}
-        </div>
-    )
+        <h2>Your Todos:</h2>
+        <ul>
+            {todos.map(todo => (
+                <li key={todo.id}>
+                    {todo.title} - {todo.completed ? '✅' : '⏳'}
+                    
+                    {' - '}
+                    <button onClick={() => toggleComplete(todo.id, todo.completed)}>
+                        {todo.completed ? 'Mark Incomplete' : 'Mark Complete'}
+                    </button>
+                    {' - '}
+                    <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+                </li>
+            ))}
+        </ul>
+
+        {todos.length === 0 && <p>No todos found</p>}
+    </div>
+)
 }
 
 export default TodoApp
