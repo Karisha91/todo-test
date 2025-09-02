@@ -44,8 +44,7 @@ const TodoApp = ({ authToken, onLogout }) => {
                 },
                 body: JSON.stringify({ 
                 title: text, 
-                completed: false,
-                userId: 1
+                completed: false
             })
             })
             if (response.ok) {
@@ -54,6 +53,22 @@ const TodoApp = ({ authToken, onLogout }) => {
         } catch (error) {
             console.error('Failed to add todo:', response.status, response.statusText);
     
+        }
+    }
+
+    const deleteTodo = async (id) => {
+        try {
+            const response = await fetch (`http://localhost:8080/todos/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            })
+            if (response.ok) {
+                fetchTodos()
+            }
+        } catch (error) {
+            console.error('Error deleting todo:', error)
         }
     }
 
@@ -82,6 +97,7 @@ const TodoApp = ({ authToken, onLogout }) => {
                 {todos.map(todo => (
                     <li key={todo.id}>
                         {todo.title} - {todo.completed ? '✅' : '⏳'}
+                        <button onClick={() => deleteTodo(todo.id)}>Delete</button>
                     </li>
                 ))}
             </ul>
